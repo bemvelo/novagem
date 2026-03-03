@@ -1,16 +1,18 @@
 "use client";
 
-interface ButtonProps {
-  children: React.ReactNode;
-  onClick?: () => void;
-  type?: "button" | "submit" | "reset";
-  variant?: "primary" | "secondary" | "success" | "danger" | "outline";
-  size?: "sm" | "md" | "lg";
-  disabled?: boolean;
-  loading?: boolean;
-  className?: string;
-}
-
+/**
+ * Button Component
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Button content
+ * @param {Function} [props.onClick] - Click handler
+ * @param {"button" | "submit" | "reset"} [props.type="button"] - Button type
+ * @param {"primary" | "secondary" | "success" | "danger" | "outline"} [props.variant="primary"] - Button style variant
+ * @param {"sm" | "md" | "lg"} [props.size="md"] - Button size
+ * @param {boolean} [props.disabled=false] - Disabled state
+ * @param {boolean} [props.loading=false] - Loading state
+ * @param {string} [props.className=""] - Additional CSS classes
+ * @returns {JSX.Element} Rendered button component
+ */
 export default function Button({
   children,
   onClick,
@@ -20,7 +22,7 @@ export default function Button({
   disabled = false,
   loading = false,
   className = "",
-}: ButtonProps) {
+}) {
   const baseStyles =
     "font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center";
 

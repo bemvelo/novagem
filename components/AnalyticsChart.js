@@ -8,21 +8,22 @@ import {
   Title,
   Tooltip,
   Legend,
-  ChartOptions,
 } from "chart.js";
 
 // Register Chart.js modules
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-type AnalyticsChartProps = {
-  title: string;
-  data: { [key: string]: string | number }[];
-};
-
-export default function AnalyticsChart({ title, data }: AnalyticsChartProps) {
+/**
+ * AnalyticsChart Component
+ * @param {Object} props - Component props
+ * @param {string} props.title - Chart title
+ * @param {Array<Object>} props.data - Chart data array with key-value pairs
+ * @returns {JSX.Element} Rendered analytics chart
+ */
+export default function AnalyticsChart({ title, data }) {
   // Extract labels and values dynamically
-  const labels = data.map((item) => Object.values(item)[0] as string);
-  const values = data.map((item) => Object.values(item)[1] as number);
+  const labels = data.map((item) => Object.values(item)[0]);
+  const values = data.map((item) => Object.values(item)[1]);
 
   const chartData = {
     labels,
@@ -53,14 +54,14 @@ export default function AnalyticsChart({ title, data }: AnalyticsChartProps) {
     ],
   };
 
-  const options: ChartOptions<"bar"> = {
+  const options = {
     responsive: true,
     maintainAspectRatio: true,
     plugins: {
       legend: {
         display: true,
         labels: {
-          font: { size: 14, weight: "bold" as const },
+          font: { size: 14, weight: "bold" },
           color: "#1f2937",
           padding: 20,
         },
@@ -68,7 +69,7 @@ export default function AnalyticsChart({ title, data }: AnalyticsChartProps) {
       title: {
         display: true,
         text: title,
-        font: { size: 18, weight: "bold" as const },
+        font: { size: 18, weight: "bold" },
         color: "#000",
         padding: 20,
       },

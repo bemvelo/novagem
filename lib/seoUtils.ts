@@ -1,18 +1,15 @@
-import { Metadata } from 'next';
-
-export interface SEOConfig {
-  title: string;
-  description: string;
-  keywords?: string[];
-  image?: string;
-  url?: string;
-  type?: 'website' | 'product' | 'article';
-}
-
 /**
  * Generate Metadata for SEO
+ * @param {Object} config - SEO configuration
+ * @param {string} config.title - Page title
+ * @param {string} config.description - Page description
+ * @param {string[]} [config.keywords] - SEO keywords
+ * @param {string} [config.image] - OG image URL
+ * @param {string} [config.url] - Page URL
+ * @param {'website' | 'product' | 'article'} [config.type] - Content type
+ * @returns {Object} Metadata object
  */
-export function generateSEOMetadata(config: SEOConfig): Metadata {
+export function generateSEOMetadata(config) {
   const baseUrl = 'https://gleamia.com';
   const url = config.url || baseUrl;
   const imageUrl = config.image || `${baseUrl}/og-image.jpg`;
@@ -25,7 +22,7 @@ export function generateSEOMetadata(config: SEOConfig): Metadata {
       title: config.title,
       description: config.description,
       url: url,
-      type: (config.type === 'product' ? 'website' : config.type) as 'website' | 'article',
+      type: config.type === 'product' ? 'website' : config.type,
       images: [
         {
           url: imageUrl,
@@ -62,18 +59,19 @@ export function generateSEOMetadata(config: SEOConfig): Metadata {
 
 /**
  * Generate Product Schema for JSON-LD
+ * @param {Object} product - Product data
+ * @param {string} product.id - Product ID
+ * @param {string} product.name - Product name
+ * @param {string} product.description - Product description
+ * @param {number} product.price - Product price
+ * @param {number} product.rating - Product rating
+ * @param {number} product.reviewCount - Number of reviews
+ * @param {string} [product.image] - Product image URL
+ * @param {string} [product.category] - Product category
+ * @param {string} [product.material] - Product material
+ * @returns {Object} Schema.org Product JSON-LD
  */
-export function generateProductSchema(product: {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  rating: number;
-  reviewCount: number;
-  image?: string;
-  category?: string;
-  material?: string;
-}) {
+export function generateProductSchema(product) {
   return {
     '@context': 'https://schema.org/',
     '@type': 'Product',
@@ -104,6 +102,7 @@ export function generateProductSchema(product: {
 
 /**
  * Generate Organization Schema for JSON-LD
+ * @returns {Object} Schema.org Organization JSON-LD
  */
 export function generateOrganizationSchema() {
   return {
@@ -129,6 +128,7 @@ export function generateOrganizationSchema() {
 
 /**
  * Generate Local Business Schema for JSON-LD
+ * @returns {Object} Schema.org LocalBusiness JSON-LD
  */
 export function generateLocalBusinessSchema() {
   return {
@@ -232,6 +232,11 @@ export const SEO_CONFIG = {
   },
 };
 
-export function getCanonicalUrl(pathname: string): string {
+/**
+ * Get canonical URL for a pathname
+ * @param {string} pathname - The pathname
+ * @returns {string} Full canonical URL
+ */
+export function getCanonicalUrl(pathname) {
   return `https://gleamia.com${pathname}`;
 }

@@ -1,15 +1,16 @@
-import type { Metadata } from 'next';
-import { generateSEOMetadata, SEO_CONFIG } from '@/lib/seoUtils';
+import { generateSEOMetadata, SEO_CONFIG } from '@/lib/seoUtils.js';
 
-export const metadata: Metadata = generateSEOMetadata({
+export const metadata = generateSEOMetadata({
   ...SEO_CONFIG.HOME,
   type: 'website',
 });
 
-export default function HomeLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+/**
+ * Home Layout Component
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Page children
+ * @returns {JSX.Element} Layout wrapper
+ */
+export default function HomeLayout({ children }) {
   return <>{children}</>;
 }
