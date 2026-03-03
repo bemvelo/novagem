@@ -18,10 +18,51 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GLEAMIA | Premium Jewelry Store",
-  description: "Discover handcrafted jewelry - necklaces, rings, earrings and accessories. Shop timeless elegance online.",
-  keywords: "jewelry, necklaces, rings, earrings, accessories, luxury",
+  title: "GLEAMIA | Premium Handcrafted Jewelry Store",
+  description: "Discover handcrafted jewelry that tells your story. Shop timeless necklaces, rings, earrings and accessories online. Premium quality, fair prices.",
+  keywords: "jewelry, handcrafted jewelry, necklaces, rings, earrings, accessories, luxury jewelry, online jewelry store",
   creator: "GLEAMIA Team",
+  icons: {
+    icon: "✨",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://gleamia.com",
+    title: "GLEAMIA | Premium Handcrafted Jewelry Store",
+    description: "Discover handcrafted jewelry that tells your story. Shop necklaces, rings, earrings and accessories.",
+    siteName: "GLEAMIA",
+    images: [
+      {
+        url: "https://gleamia.com/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "GLEAMIA Jewelry Store",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GLEAMIA | Premium Handcrafted Jewelry",
+    description: "Discover handcrafted jewelry. Shop necklaces, rings, earrings and accessories.",
+    images: ["https://gleamia.com/twitter-image.jpg"],
+  },
+  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://gleamia.com",
+  },
 };
 
 export default function RootLayout({

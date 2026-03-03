@@ -1,0 +1,25 @@
+# GLEAMIA robots.txt
+# Generated for SEO compliance
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /users/cart
+Disallow: /users/checkout
+Disallow: /_next/
+Disallow: /api/
+Disallow: /*.json$
+Allow: /login
+Allow: /signup
+
+# Specific bot rules
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://gleamia.com/sitemap.xml

@@ -1,6 +1,7 @@
 "use client";
 
 import { useWishlist } from "@/lib/wishlistContext";
+import StarRating from "./StarRating";
 
 type Product = {
   id: string;
@@ -9,6 +10,8 @@ type Product = {
   description?: string;
   imageUrl?: string;
   category?: string;
+  rating?: number;
+  reviewCount?: number;
 };
 
 type ProductCardProps = {
@@ -64,6 +67,17 @@ export default function ProductCard({
           <p className="text-sm text-gray-600 mb-3 line-clamp-2">
             {product.description}
           </p>
+        )}
+
+        {/* Rating */}
+        {product.rating !== undefined && (
+          <div className="mb-3">
+            <StarRating 
+              rating={product.rating} 
+              totalReviews={product.reviewCount || 0}
+              size="sm"
+            />
+          </div>
         )}
 
         {/* Price */}
