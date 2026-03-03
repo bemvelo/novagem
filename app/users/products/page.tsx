@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/src/lib/firebase";
+import { supabase } from "@/src/lib/supabase";
 import Link from "next/link";
 
 import ProductCard from "../../../components/ProductCard";
@@ -14,7 +13,7 @@ type Product = {
   name: string;
   price: number;
   description?: string;
-  imageUrl?: string;
+  image_url?: string;
   category?: string;
 };
 
@@ -31,12 +30,16 @@ export default function ProductsPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "products"));
-        const items = snapshot.docs.map((doc) => {
-          const data = doc.data() as Omit<Product, "id">;
-          return { ...data, id: doc.id } as Product;
-        });
-        setProducts(items);
+        const { data, error } = await supabase
+          .from("products")
+          .select("*");
+
+        if (error) {
+          console.error("Error fetching products:", error);
+          setProducts([]);
+        } else {
+          setProducts(data || []);
+        }
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {

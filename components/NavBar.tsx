@@ -2,9 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth, db } from "@/src/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { supabase } from "@/src/lib/supabase";
 
 export default function NavBar() {
   const [user, setUser] = useState<any>(null);
@@ -13,22 +11,36 @@ export default function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        const docRef = doc(db, "users", currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        setRole(docSnap.exists() ? docSnap.data().role : "user");
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        
+        // Get user role from database
+        const { data, error } = await supabase
+          .from("users")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
+        
+        if (data && !error) {
+          setRole(data.role || "user");
+        } else {
+          setRole("user");
+        }
       } else {
+        setUser(null);
         setRole(null);
       }
       setLoading(false);
     });
-    return unsubscribe;
+
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
   const handleLogout = async () => {
-    await signOut(auth);
+    await supabase.auth.signOut();
     setUser(null);
     setRole(null);
   };

@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth, db } from "@/src/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { supabase } from "@/src/lib/supabase";
 import NavBar from "@/components/NavBar";
 
 type UserRole = "admin" | "user" | null;
@@ -16,27 +15,30 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const currentUser = auth.currentUser;
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (!currentUser) {
-        router.push("/login"); // redirect if not logged in
+      if (!session?.user) {
+        router.push("/login");
         return;
       }
 
-      setEmail(currentUser.email || "");
+      setEmail(session.user.email || "");
 
       try {
-        const docRef = doc(db, "users", currentUser.uid);
-        const docSnap = await getDoc(docRef);
+        const { data, error } = await supabase
+          .from("users")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
 
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setRole(data.role);
+        if (error || !data) {
+          setRole("user");
         } else {
-          setRole("user"); // default to user if not in Firestore
+          setRole(data.role);
         }
       } catch (err: any) {
-        alert(err.message);
+        console.error(err.message);
+        setRole("user");
       } finally {
         setLoading(false);
       }
@@ -60,13 +62,12 @@ export default function ProfilePage() {
           <AdminCard title="Orders" link="/admin/orders" />
           <AdminCard title="Analytics" link="/admin/analytics" />
           <AdminCard title="Users" link="/admin/users" />
-          <AdminCard title="Manage" link="/admin/manage" />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <UserCard title="Products" link="/products" />
-          <UserCard title="Cart" link="/cart" />
-          <UserCard title="Checkout" link="/checkout" />
+          <UserCard title="Products" link="/users/products" />
+          <UserCard title="Cart" link="/users/cart" />
+          <UserCard title="Checkout" link="/users/checkout" />
           <UserCard title="Logout" link="/logout" />
         </div>
       )}
@@ -74,9 +75,6 @@ export default function ProfilePage() {
   );
 }
 
-/* =====================
-   ADMIN CARD
-   ===================== */
 function AdminCard({ title, link }: { title: string; link: string }) {
   return (
     <a href={link} className="block p-6 rounded-lg bg-white shadow hover:bg-gray-100">
@@ -85,9 +83,6 @@ function AdminCard({ title, link }: { title: string; link: string }) {
   );
 }
 
-/* =====================
-   USER CARD
-   ===================== */
 function UserCard({ title, link }: { title: string; link: string }) {
   return (
     <a href={link} className="block p-6 rounded-lg bg-white shadow hover:bg-gray-100">

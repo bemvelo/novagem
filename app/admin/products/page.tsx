@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/src/lib/firebase";
+import { supabase } from "@/src/lib/supabase";
 
 import NavBar from "../../../components/NavBar";
 import ProductCard from "../../../components/ProductCard";
@@ -14,7 +13,7 @@ type Product = {
   name: string;
   price: number;
   description?: string;
-  imageUrl?: string;
+  image_url?: string;
   category?: string;
 };
 
@@ -22,24 +21,27 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
-        const snapshot = await getDocs(collection(db, "products"));
-        const items: Product[] = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as {
-            name: string;
-            price: number;
-            description?: string;
-            imageUrl?: string;
-            category?: string;
-          }),
-        }));
-        setProducts(items);
+        const { data, error } = await supabase
+          .from("products")
+          .select("*");
+
+        if (error) {
+          console.error("Error fetching products:", error);
+          setProducts([]);
+        } else {
+          setProducts(data || []);
+        }
       } catch (error: any) {
-        alert(error.message);
+        console.error("Error:", error.message);
+        setProducts([]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -52,6 +54,16 @@ export default function ProductsPage() {
       selectedCategory === "All" || p.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#e6e6fa] text-black p-6">
+        <NavBar />
+        <h1 className="text-3xl font-bold mb-6 text-center">Products</h1>
+        <p className="text-center">Loading products...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#e6e6fa] text-black p-6">
@@ -73,9 +85,9 @@ export default function ProductsPage() {
             key={product.id}
             className="bg-white p-4 rounded shadow-md flex flex-col justify-between"
           >
-            {product.imageUrl && (
+            {product.image_url && (
               <img
-                src={product.imageUrl}
+                src={product.image_url}
                 alt={product.name}
                 className="w-full h-48 object-cover rounded mb-4"
               />

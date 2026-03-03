@@ -2,17 +2,21 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/src/lib/firebase";
+import { supabase } from "@/src/lib/supabase";
 
 export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsLoggedIn(!!user);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsLoggedIn(!!session);
+      setLoading(false);
     });
-    return unsubscribe;
+
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
   return (

@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { auth, db } from "@/src/lib/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { supabase } from "@/src/lib/supabase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -36,20 +34,39 @@ export default function SignupPage() {
     setError("");
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
+      // Sign up with Supabase
+      const { data, error: authError } = await supabase.auth.signUp({
         email,
-        password
-      );
-      const user = userCredential.user;
+        password,
+      });
+
+      if (authError) {
+        setError(authError.message || "Sign up failed. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      if (!data.user) {
+        setError("Sign up failed. Please try again.");
+        setLoading(false);
+        return;
+      }
 
       const role = email === "admin@gleamia.com" ? "admin" : "user";
 
-      await setDoc(doc(db, "users", user.uid), {
+      // Insert user data into users table
+      const { error: insertError } = await supabase.from("users").insert({
+        id: data.user.id,
         email,
         role,
-        createdAt: new Date(),
+        created_at: new Date().toISOString(),
       });
+
+      if (insertError) {
+        setError(insertError.message || "Failed to create user profile");
+        setLoading(false);
+        return;
+      }
 
       if (role === "admin") {
         router.push("/admin");

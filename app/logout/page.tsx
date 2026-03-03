@@ -1,51 +1,58 @@
 "use client";
 
-import { useState } from "react";
-import { auth } from "@/src/lib/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { supabase } from "@/src/lib/supabase";
 import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
+export default function LogoutPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const login = async () => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-
-      // simple role logic
-      if (email === "admin@gleamia.com") {
-        router.push("/admin");
-      } else {
-        router.push("/products");
+  useEffect(() => {
+    const logout = async () => {
+      try {
+        const { error } = await supabase.auth.signOut();
+        
+        if (error) {
+          setError(error.message || "Failed to logout");
+        } else {
+          // Redirect to login after successful logout
+          router.push("/login");
+        }
+      } catch (err: any) {
+        setError(err.message || "Logout failed");
+      } finally {
+        setLoading(false);
       }
-    } catch (error: any) {
-      alert(error.message);
-    }
-  };
+    };
 
-  return (
-    <div className="p-10 flex flex-col gap-4 max-w-sm mx-auto">
-      <h1 className="text-xl font-bold">Login</h1>
+    logout();
+  }, [router]);
 
-      <input
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-        className="border p-2"
-      />
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">Logging out...</p>
+      </div>
+    );
+  }
 
-      <input
-        placeholder="Password"
-        type="password"
-        onChange={(e) => setPassword(e.target.value)}
-        className="border p-2"
-      />
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={() => router.push("/")}
+            className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800"
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-      <button onClick={login} className="bg-green-600 text-white p-2">
-        Login
-      </button>
-    </div>
-  );
+  return null;
 }
