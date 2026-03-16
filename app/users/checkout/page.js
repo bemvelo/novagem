@@ -25,8 +25,8 @@ export default function CheckoutPage() {
     setCart(data);
   }, []);
 
-  const total     = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  const shipping  = total >= 30 ? 0 : 4.99;
+  const total      = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const shipping   = total >= 30 ? 0 : 4.99;
   const grandTotal = total + shipping;
   const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0);
 

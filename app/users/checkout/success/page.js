@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 export default function SuccessPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
     const getUser = async () => {
@@ -14,6 +15,8 @@ export default function SuccessPage() {
       if (session?.user) setEmail(session.user.email || "");
     };
     getUser();
+    const t = setTimeout(() => setShow(true), 100);
+    return () => clearTimeout(t);
   }, []);
 
   const handleLogout = async () => {
@@ -23,18 +26,17 @@ export default function SuccessPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(160deg, #f0ebf8 0%, #e8dff5 100%)", fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
-      <div style={{ width: "100%", maxWidth: "520px", textAlign: "center" }}>
+      <div style={{ width: "100%", maxWidth: "520px", textAlign: "center", opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(20px)", transition: "all 0.5s ease" }}>
 
-        {/* Success card */}
         <div style={{ background: "#fff", borderRadius: "24px", padding: "52px 40px", border: "1px solid #e4d8f8", boxShadow: "0 8px 40px rgba(108,63,197,0.14)" }}>
 
-          {/* Animated checkmark circle */}
-          <div style={{ width: "88px", height: "88px", borderRadius: "50%", background: "linear-gradient(135deg, #6c3fc5, #9b72e0)", margin: "0 auto 24px", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 28px rgba(108,63,197,0.4)", fontSize: "40px" }}>
+          <div style={{ width: "88px", height: "88px", borderRadius: "50%", background: "linear-gradient(135deg, #6c3fc5, #9b72e0)", margin: "0 auto 24px", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 28px rgba(108,63,197,0.4)", fontSize: "40px", color: "#fff" }}>
             ✓
           </div>
 
-          {/* Confetti emoji row */}
           <div style={{ fontSize: "28px", marginBottom: "20px", letterSpacing: "6px" }}>🎉 💍 🎉</div>
+
+          <p style={{ fontSize: "11px", letterSpacing: "4px", color: "#9b72e0", textTransform: "uppercase", fontWeight: "600", marginBottom: "10px" }}>Gleamia</p>
 
           <h1 style={{ fontSize: "28px", fontFamily: "Georgia, serif", fontWeight: "400", color: "#1a1a2e", marginBottom: "12px", letterSpacing: "1px" }}>
             Order Confirmed!
@@ -50,7 +52,6 @@ export default function SuccessPage() {
             </p>
           )}
 
-          {/* What's next */}
           <div style={{ background: "linear-gradient(135deg, #f5f0ff, #ede5f8)", borderRadius: "14px", padding: "20px", marginBottom: "32px", textAlign: "left" }}>
             <p style={{ fontSize: "13px", fontWeight: "700", color: "#6c3fc5", marginBottom: "12px", letterSpacing: "0.5px", textTransform: "uppercase" }}>What happens next?</p>
             {[
@@ -65,7 +66,6 @@ export default function SuccessPage() {
             ))}
           </div>
 
-          {/* Buttons */}
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <Link href="/users/products" style={{ background: "linear-gradient(135deg, #6c3fc5, #9b72e0)", color: "#fff", textDecoration: "none", padding: "14px", borderRadius: "12px", fontSize: "14px", fontWeight: "700", letterSpacing: "0.5px", boxShadow: "0 4px 14px rgba(108,63,197,0.35)", display: "block" }}>
               💍 Continue Shopping
@@ -85,7 +85,6 @@ export default function SuccessPage() {
 
         </div>
 
-        {/* Bottom tagline */}
         <p style={{ marginTop: "24px", fontSize: "13px", color: "#a0a0c0" }}>
           Thank you for choosing <span style={{ color: "#9b72e0", fontWeight: "700", fontFamily: "Georgia, serif", letterSpacing: "2px" }}>GLEAMIA</span>
         </p>

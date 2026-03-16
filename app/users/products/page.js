@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 import Link from "next/link";
-import Image from "next/image";
 
 const CATEGORIES = ["All", "Rings", "Necklaces", "Earrings", "Bracelets", "Anklets", "Sets"];
 
@@ -10,7 +10,8 @@ const EMOJI_MAP = {
   Rings: "💍", Necklaces: "📿", Earrings: "✨", Bracelets: "📿", Anklets: "⭐", Sets: "💎", default: "💎"
 };
 
-export default function ProductsPage() {
+function ProductsContent() {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -30,14 +31,62 @@ export default function ProductsPage() {
       finally { setLoading(false); }
     };
     fetchProducts();
-  }, []);
 
-  const addToCart = (id) => setCart(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
-  const removeFromCart = (id) => setCart(prev => {
-    const qty = (prev[id] || 0) - 1;
-    if (qty <= 0) { const c = { ...prev }; delete c[id]; return c; }
-    return { ...prev, [id]: qty };
-  });
+    // Read category from URL param
+    const categoryParam = searchParams.get("category");
+    if (categoryParam) {
+      const matched = CATEGORIES.find(
+        c => c.toLowerCase() === categoryParam.toLowerCase() ||
+             c.toLowerCase().replace(" ", "-") === categoryParam.toLowerCase()
+      );
+      if (matched) setSelectedCategory(matched);
+    }
+
+    // Load existing cart state from localStorage
+    const saved = JSON.parse(localStorage.getItem("cart") || "[]");
+    const cartMap = {};
+    saved.forEach(item => { cartMap[item.id] = item.quantity; });
+    setCart(cartMap);
+  }, [searchParams]);
+
+  const addToCart = (id) => {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    const existing = JSON.parse(localStorage.getItem("cart") || "[]");
+    const found = existing.find(i => i.id === id);
+
+    const updatedCart = found
+      ? existing.map(i => i.id === id ? { ...i, quantity: i.quantity + 1 } : i)
+      : [...existing, {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          imageUrl: product.image_url,
+          category: product.category,
+          quantity: 1
+        }];
+
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    window.dispatchEvent(new Event("cartUpdated"));
+    setCart(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+  };
+
+  const removeFromCart = (id) => {
+    const existing = JSON.parse(localStorage.getItem("cart") || "[]");
+    const updatedCart = existing
+      .map(i => i.id === id ? { ...i, quantity: i.quantity - 1 } : i)
+      .filter(i => i.quantity > 0);
+
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    window.dispatchEvent(new Event("cartUpdated"));
+    setCart(prev => {
+      const qty = (prev[id] || 0) - 1;
+      if (qty <= 0) { const c = { ...prev }; delete c[id]; return c; }
+      return { ...prev, [id]: qty };
+    });
+  };
+
   const toggleWishlist = (id) => setWishlist(prev => ({ ...prev, [id]: !prev[id] }));
   const cartTotal = Object.values(cart).reduce((a, b) => a + b, 0);
 
@@ -123,7 +172,7 @@ export default function ProductsPage() {
         {/* Grid */}
         {loading ? (
           <div style={{ textAlign: "center", padding: "80px 0" }}>
-            <div style={{ fontSize: "48px", marginBottom: "16px", animation: "pulse 1.5s infinite" }}>💍</div>
+            <div style={{ fontSize: "48px", marginBottom: "16px" }}>💍</div>
             <p style={{ color: "#6b6b8a", fontSize: "16px" }}>Loading your collection...</p>
           </div>
         ) : filtered.length === 0 ? (
@@ -144,30 +193,22 @@ export default function ProductsPage() {
                 onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 10px 28px rgba(108,63,197,0.18)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 2px 8px rgba(108,63,197,0.06)"; e.currentTarget.style.transform = "none"; }}>
 
-                {/* Image area */}
                 <div style={{ position: "relative", height: "240px", background: "linear-gradient(135deg, #f5f0ff, #ede5f8)", overflow: "hidden", flexShrink: 0 }}>
                   {product.image_url && !imgErrors[product.id] ? (
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
+                    <img src={product.image_url} alt={product.name}
                       style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                      onError={() => setImgErrors(prev => ({ ...prev, [product.id]: true }))}
-                    />
+                      onError={() => setImgErrors(prev => ({ ...prev, [product.id]: true }))} />
                   ) : (
                     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px" }}>
                       <span style={{ fontSize: "80px" }}>{EMOJI_MAP[product.category] || EMOJI_MAP.default}</span>
                       <span style={{ fontSize: "12px", color: "#9b72e0", fontWeight: "600" }}>No image</span>
                     </div>
                   )}
-
-                  {/* Category badge */}
                   {product.category && (
                     <span style={{ position: "absolute", top: "12px", left: "12px", background: "rgba(78,45,150,0.85)", color: "#fff", fontSize: "11px", fontWeight: "700", padding: "4px 12px", borderRadius: "20px", backdropFilter: "blur(4px)", letterSpacing: "0.3px" }}>
                       {product.category}
                     </span>
                   )}
-
-                  {/* Wishlist */}
                   <button onClick={() => toggleWishlist(product.id)}
                     style={{ position: "absolute", top: "10px", right: "10px", background: "rgba(255,255,255,0.95)", border: "none", width: "36px", height: "36px", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", transition: "transform 0.2s" }}
                     onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15)"}
@@ -176,22 +217,17 @@ export default function ProductsPage() {
                   </button>
                 </div>
 
-                {/* Info */}
                 <div style={{ padding: "18px 18px 20px", display: "flex", flexDirection: "column", flex: 1 }}>
                   <h3 style={{ fontSize: "15px", fontWeight: "700", marginBottom: "6px", color: "#1a1a2e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{product.name}</h3>
-
                   {product.description && (
                     <p style={{ fontSize: "12px", color: "#6b6b8a", marginBottom: "14px", lineHeight: "1.5", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", flex: 1 }}>{product.description}</p>
                   )}
-
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", marginTop: "auto" }}>
                     <span style={{ fontSize: "22px", fontWeight: "700", color: "#6c3fc5" }}>${Number(product.price).toFixed(2)}</span>
                     {product.stock !== undefined && product.stock <= 5 && product.stock > 0 && (
                       <span style={{ fontSize: "11px", color: "#ff6b9d", fontWeight: "700", background: "rgba(255,107,157,0.1)", padding: "3px 10px", borderRadius: "20px" }}>Only {product.stock} left!</span>
                     )}
                   </div>
-
-                  {/* Cart controls */}
                   {cart[product.id] ? (
                     <div style={{ display: "flex", alignItems: "center", border: "2px solid #6c3fc5", borderRadius: "10px", overflow: "hidden" }}>
                       <button onClick={() => removeFromCart(product.id)}
@@ -219,7 +255,6 @@ export default function ProductsPage() {
         )}
       </div>
 
-      {/* Floating cart */}
       {cartTotal > 0 && (
         <div style={{ position: "fixed", bottom: "28px", right: "28px", zIndex: 999 }}>
           <Link href="/users/cart"
@@ -230,5 +265,20 @@ export default function ProductsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(160deg, #f0ebf8 0%, #e8dff5 100%)" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: "48px", marginBottom: "16px" }}>💍</div>
+          <p style={{ color: "#6b6b8a", fontSize: "16px" }}>Loading collection...</p>
+        </div>
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }
