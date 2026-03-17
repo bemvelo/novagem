@@ -7,7 +7,7 @@ export default function Footer() {
       {/* Top perks strip */}
       <div style={{ background: "rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "14px 32px", display: "flex", justifyContent: "center", gap: "48px", flexWrap: "wrap" }}>
-          {[["🚚","Free Deliveryg","On orders over $300"],["↩️","Free Returns","On all orders"],["🔒","Secure Payment","100% protected"],["💎","Quality Guaranteed","Premium materials"]].map(([icon,title,sub]) => (
+          {[["🚚","Free Delivery","On orders over $300"],["↩️","Free Returns","On all orders"],["🔒","Secure Payment","100% protected"],["💎","Quality Guaranteed","Premium materials"]].map(([icon,title,sub]) => (
             <div key={title} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <span style={{ fontSize: "20px" }}>{icon}</span>
               <div>
@@ -27,7 +27,7 @@ export default function Footer() {
           <div>
             <span style={{ fontFamily: "Georgia, serif", fontSize: "24px", fontWeight: "700", letterSpacing: "4px", color: "#fff", display: "block", marginBottom: "16px" }}>GLEAMIA</span>
             <p style={{ fontSize: "13px", lineHeight: "1.8", color: "#c4a8f0", marginBottom: "20px", maxWidth: "260px" }}>
-              Jewelry that celebrates your unique style. Quality, Elegance and Timeless beauty in every piece.
+              Jewellery that celebrates your unique style. Quality, Elegance and Timeless beauty in every piece.
             </p>
             {/* Social links */}
             <div style={{ display: "flex", gap: "10px" }}>

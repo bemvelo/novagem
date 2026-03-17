@@ -12,12 +12,7 @@ const categories = [
   { name: "Sets", emoji: "💎", desc: "Matching collections" },
 ];
 
-const flashDeals = [
-  { name: "Gold Chain Necklace", price: "$12.99", original: "$24.99", discount: "48% OFF", emoji: "📿" },
-  { name: "Crystal Stud Earrings", price: "$6.99", original: "$14.99", discount: "53% OFF", emoji: "✨" },
-  { name: "Silver Band Ring", price: "$8.99", original: "$18.99", discount: "52% OFF", emoji: "💍" },
-  { name: "Pearl Bracelet", price: "$9.99", original: "$19.99", discount: "50% OFF", emoji: "⭐" },
-];
+const EMOJI_MAP = { Rings: "💍", Necklaces: "📿", Earrings: "✨", Bracelets: "📿", Anklets: "⭐", Sets: "💎", default: "💎" };
 
 const perks = [
   ["🚚", "Free Shipping", "On orders over $30"],
@@ -29,10 +24,33 @@ const perks = [
 export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ h: 5, m: 59, s: 59 });
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [imgErrors, setImgErrors] = useState({});
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => setIsLoggedIn(!!session));
     return () => subscription?.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data, error } = await supabase.from("products").select("*").limit(4);
+        if (error) {
+          console.error("Error fetching products:", error);
+          setProducts([]);
+        } else {
+          setProducts(data || []);
+        }
+      } catch (e) {
+        console.error("Error:", e);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
   }, []);
 
   useEffect(() => {
@@ -101,10 +119,10 @@ export default function HomePage() {
 
       <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 32px" }}>
 
-        {/* Flash Sale */}
+        {/* Featured Products */}
         <div style={{ padding: "44px 0 24px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "22px", flexWrap: "wrap" }}>
-            <h2 style={{ fontSize: "20px", fontWeight: "700", margin: 0, color: "#1a1a2e" }}>⚡ FLASH SALE</h2>
+            <h2 style={{ fontSize: "20px", fontWeight: "700", margin: 0, color: "#1a1a2e" }}>⚡ FEATURED PRODUCTS</h2>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={{ fontSize: "12px", color: "#6b6b8a" }}>Ends in:</span>
               {[pad(timeLeft.h), pad(timeLeft.m), pad(timeLeft.s)].map((u, i) => (
@@ -116,60 +134,48 @@ export default function HomePage() {
             </div>
             <Link href={shopLink} style={{ marginLeft: "auto", fontSize: "13px", color: "#6c3fc5", textDecoration: "none", fontWeight: "700" }}>View All →</Link>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(210px,1fr))", gap: "16px" }}>
-            {flashDeals.map(item => (
-              <Link key={item.name} href={shopLink} style={{ textDecoration: "none", color: "#1a1a2e" }}>
-                <div style={{ background: "#fff", border: "1px solid #e4d8f8", borderRadius: "12px", overflow: "hidden", cursor: "pointer", transition: "all 0.2s", boxShadow: "0 2px 8px rgba(108,63,197,0.06)" }}
-                  onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(108,63,197,0.18)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 2px 8px rgba(108,63,197,0.06)"; e.currentTarget.style.transform = "none"; }}>
-                  <div style={{ background: "linear-gradient(135deg, #f0ebf8, #e8dff5)", height: "200px", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                    <span style={{ fontSize: "72px" }}>{item.emoji}</span>
-                    <span style={{ position: "absolute", top: "10px", left: "10px", background: "#ff6b9d", color: "#fff", fontSize: "11px", fontWeight: "700", padding: "3px 10px", borderRadius: "20px" }}>{item.discount}</span>
-                  </div>
-                  <div style={{ padding: "14px" }}>
-                    <p style={{ fontSize: "13px", margin: "0 0 8px", fontWeight: "500" }}>{item.name}</p>
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                      <span style={{ fontSize: "16px", fontWeight: "700", color: "#6c3fc5" }}>{item.price}</span>
-                      <span style={{ fontSize: "12px", color: "#a0a0c0", textDecoration: "line-through" }}>{item.original}</span>
+          
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "60px 0" }}>
+              <div style={{ fontSize: "48px", marginBottom: "16px" }}>💍</div>
+              <p style={{ color: "#6b6b8a", fontSize: "14px" }}>Loading featured products...</p>
+            </div>
+          ) : products.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "60px 0" }}>
+              <p style={{ color: "#6b6b8a", fontSize: "14px" }}>No products available yet. Check back soon!</p>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(210px,1fr))", gap: "16px" }}>
+              {products.map(product => (
+                <Link key={product.id} href={shopLink} style={{ textDecoration: "none", color: "#1a1a2e" }}>
+                  <div style={{ background: "#fff", border: "1px solid #e4d8f8", borderRadius: "12px", overflow: "hidden", cursor: "pointer", transition: "all 0.2s", boxShadow: "0 2px 8px rgba(108,63,197,0.06)" }}
+                    onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(108,63,197,0.18)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 2px 8px rgba(108,63,197,0.06)"; e.currentTarget.style.transform = "none"; }}>
+                    <div style={{ background: "linear-gradient(135deg, #f0ebf8, #e8dff5)", height: "200px", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+                      {product.image_url && !imgErrors[product.id] ? (
+                        <img src={product.image_url} alt={product.name}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                          onError={() => setImgErrors(prev => ({ ...prev, [product.id]: true }))} />
+                      ) : (
+                        <span style={{ fontSize: "72px" }}>{EMOJI_MAP[product.category] || EMOJI_MAP.default}</span>
+                      )}
+                    </div>
+                    <div style={{ padding: "14px" }}>
+                      <p style={{ fontSize: "13px", margin: "0 0 8px", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{product.name}</p>
+                      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                        <span style={{ fontSize: "16px", fontWeight: "700", color: "#6c3fc5" }}>${Number(product.price).toFixed(2)}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Categories */}
-        <div id="features" style={{ padding: "40px 0" }}>
-          <h2 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "22px", color: "#1a1a2e" }}>Shop by Category</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: "12px" }}>
-            {categories.map(cat => (
-              <Link key={cat.name} href={isLoggedIn ? `/users/products?category=${cat.name}` : "/login"} style={{ textDecoration: "none" }}>
-                <div style={{ background: "#fff", border: "1px solid #e4d8f8", borderRadius: "12px", padding: "22px 12px", textAlign: "center", cursor: "pointer", transition: "all 0.2s", boxShadow: "0 2px 8px rgba(108,63,197,0.06)" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#6c3fc5"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.querySelectorAll("div").forEach(d => d.style.color = "#fff"); }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.transform = "none"; e.currentTarget.querySelectorAll("div").forEach(d => d.style.color = ""); }}>
-                  <div style={{ fontSize: "30px", marginBottom: "8px" }}>{cat.emoji}</div>
-                  <div style={{ fontSize: "13px", fontWeight: "600", marginBottom: "4px", color: "#1a1a2e" }}>{cat.name}</div>
-                  <div style={{ fontSize: "11px", color: "#6b6b8a" }}>{cat.desc}</div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
 
-        {/* Why Choose Us */}
-        <div style={{ background: "#fff", borderRadius: "16px", padding: "44px 40px", marginBottom: "40px", border: "1px solid #e4d8f8", boxShadow: "0 2px 8px rgba(108,63,197,0.06)" }}>
-          <h2 style={{ fontSize: "20px", fontWeight: "700", textAlign: "center", marginBottom: "32px", color: "#1a1a2e" }}>Why Choose GLEAMIA</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: "24px", textAlign: "center" }}>
-            {[["🎨","Handcrafted","Each piece carefully made"],["✅","Quality Assured","Premium materials"],["🚚","Fast Shipping","Delivered in 3-5 days"],["💰","Fair Prices","Best value for luxury"]].map(([icon,title,desc]) => (
-              <div key={title}>
-                <div style={{ fontSize: "32px", marginBottom: "10px" }}>{icon}</div>
-                <div style={{ fontSize: "14px", fontWeight: "700", marginBottom: "6px", color: "#6c3fc5" }}>{title}</div>
-                <div style={{ fontSize: "12px", color: "#6b6b8a" }}>{desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+
+
 
         {/* Testimonials */}
         <div style={{ paddingBottom: "44px" }}>
