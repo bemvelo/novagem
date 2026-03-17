@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import ProductReviews from '@/components/ProductReviews';
-import StarRating from '@/components/StarRating';
+// import ProductReviews from '@/components/ProductReviews';
+// import StarRating from '@/components/StarRating';
 
 // Mock data - replace with real data from Firestore
 const mockProduct = {
