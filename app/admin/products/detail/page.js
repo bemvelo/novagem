@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-
 // Mock data
 const mockProduct = {
   id: 'product-1',
