@@ -3,15 +3,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "../lib/supabase";
 
-const categories = [
-  { name: "Necklaces", emoji: "📿", desc: "Chains & pendants" },
-  { name: "Rings", emoji: "💍", desc: "Statement & everyday" },
-  { name: "Earrings", emoji: "✨", desc: "Studs & drops" },
-  { name: "Bracelets", emoji: "📿", desc: "Bangles & chains" },
-  { name: "Anklets", emoji: "⭐", desc: "Delicate & bold" },
-  { name: "Sets", emoji: "💎", desc: "Matching collections" },
-];
-
 const EMOJI_MAP = { Rings: "💍", Necklaces: "📿", Earrings: "✨", Bracelets: "📿", Anklets: "⭐", Sets: "💎", default: "💎" };
 
 const perks = [
@@ -184,7 +175,7 @@ export default function HomePage() {
             {[["Sarah M.","Beautiful quality! Arrived perfectly packaged."],["James L.","Exactly what I was looking for. Highly recommend!"],["Anna R.","Amazing customer service and stunning pieces."]].map(([name,review]) => (
               <div key={name} style={{ background: "#fff", border: "1px solid #e4d8f8", padding: "22px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(108,63,197,0.06)" }}>
                 <p style={{ color: "#ff6b9d", marginBottom: "10px", fontSize: "16px" }}>⭐⭐⭐⭐⭐</p>
-                <p style={{ fontSize: "14px", color: "#4a4a6a", marginBottom: "12px", fontStyle: "italic" }}>"{review}"</p>
+                <p style={{ fontSize: "14px", color: "#4a4a6a", marginBottom: "12px", fontStyle: "italic" }}>&ldquo;{review}&rdquo;</p>
                 <p style={{ fontSize: "13px", fontWeight: "700", color: "#6c3fc5" }}>— {name}</p>
               </div>
             ))}
@@ -210,7 +201,7 @@ export default function HomePage() {
       {!isLoggedIn && (
         <div style={{ background: "linear-gradient(135deg, #4e2d96, #6c3fc5)", color: "#fff", padding: "60px 24px", textAlign: "center" }}>
           <h2 style={{ fontSize: "28px", fontFamily: "Georgia,serif", fontWeight: "400", marginBottom: "14px" }}>Ready to Find Your Perfect Piece?</h2>
-          <p style={{ color: "#d4b8ff", fontSize: "14px", marginBottom: "32px" }}>Join thousands of happy customers who've found their favorite jewelry at GLEAMIA.</p>
+          <p style={{ color: "#d4b8ff", fontSize: "14px", marginBottom: "32px" }}>Join thousands of happy customers who have found their favorite jewelry at GLEAMIA.</p>
           <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link href="/login" style={{ background: "#fff", color: "#6c3fc5", padding: "13px 40px", textDecoration: "none", fontSize: "13px", fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", borderRadius: "8px" }}>LOGIN</Link>
             <Link href="/signup" style={{ background: "#ff6b9d", color: "#fff", padding: "13px 40px", textDecoration: "none", fontSize: "13px", fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", borderRadius: "8px" }}>SIGN UP</Link>
