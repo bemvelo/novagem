@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 import Link from "next/link";
@@ -13,17 +14,19 @@ const PAYMENT_METHODS = [
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      return JSON.parse(localStorage.getItem("cart") || "[]");
+    } catch {
+      return [];
+    }
+  });
   const [phone, setPhone] = useState("");
   const [method, setMethod] = useState("ecocash");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [imgErrors, setImgErrors] = useState({});
-
-  useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("cart") || "[]");
-    setCart(data);
-  }, []);
 
   const total      = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const shipping   = total >= 30 ? 0 : 4.99;
@@ -71,7 +74,7 @@ export default function CheckoutPage() {
       {/* Hero */}
       <div style={{ background: "linear-gradient(135deg, #4e2d96 0%, #6c3fc5 100%)", padding: "44px 32px", color: "#fff" }}>
         <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-          <p style={{ fontSize: "11px", letterSpacing: "4px", color: "#c4a8f0", textTransform: "uppercase", fontWeight: "600", marginBottom: "8px" }}>Gleamia</p>
+          <p style={{ fontSize: "11px", letterSpacing: "4px", color: "#c4a8f0", textTransform: "uppercase", fontWeight: "600", marginBottom: "8px" }}>novagem</p>
           <h1 style={{ fontSize: "clamp(24px,4vw,40px)", fontFamily: "Georgia,serif", fontWeight: "300", letterSpacing: "2px", margin: "0 0 6px" }}>💳 Checkout</h1>
           <p style={{ color: "#c4a8f0", fontSize: "14px" }}>Complete your order — {totalItems} item{totalItems !== 1 ? "s" : ""}</p>
         </div>
@@ -161,7 +164,8 @@ export default function CheckoutPage() {
                   <div key={item.id} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                     <div style={{ width: "52px", height: "52px", borderRadius: "10px", background: "linear-gradient(135deg, #f5f0ff, #ede5f8)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
                       {item.imageUrl && !imgErrors[item.id] ? (
-                        <img src={item.imageUrl} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        <Image src={item.imageUrl} alt={item.name} width={52} height={52}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
                           onError={() => setImgErrors(p => ({ ...p, [item.id]: true }))} />
                       ) : (
                         <span style={{ fontSize: "24px" }}>{EMOJI_MAP[item.category] || EMOJI_MAP.default}</span>

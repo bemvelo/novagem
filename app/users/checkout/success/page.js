@@ -36,14 +36,14 @@ export default function SuccessPage() {
 
           <div style={{ fontSize: "28px", marginBottom: "20px", letterSpacing: "6px" }}>🎉 💍 🎉</div>
 
-          <p style={{ fontSize: "11px", letterSpacing: "4px", color: "#9b72e0", textTransform: "uppercase", fontWeight: "600", marginBottom: "10px" }}>Gleamia</p>
+          <p style={{ fontSize: "11px", letterSpacing: "4px", color: "#9b72e0", textTransform: "uppercase", fontWeight: "600", marginBottom: "10px" }}>novagem</p>
 
           <h1 style={{ fontSize: "28px", fontFamily: "Georgia, serif", fontWeight: "400", color: "#1a1a2e", marginBottom: "12px", letterSpacing: "1px" }}>
             Order Confirmed!
           </h1>
 
           <p style={{ fontSize: "15px", color: "#6b6b8a", marginBottom: "8px", lineHeight: "1.6" }}>
-            Your payment was received. Thank you for shopping with GLEAMIA!
+            Your payment was received. Thank you for shopping with novagem!
           </p>
 
           {email && (
@@ -86,7 +86,7 @@ export default function SuccessPage() {
         </div>
 
         <p style={{ marginTop: "24px", fontSize: "13px", color: "#a0a0c0" }}>
-          Thank you for choosing <span style={{ color: "#9b72e0", fontWeight: "700", fontFamily: "Georgia, serif", letterSpacing: "2px" }}>GLEAMIA</span>
+          Thank you for choosing <span style={{ color: "#9b72e0", fontWeight: "700", fontFamily: "Georgia, serif", letterSpacing: "2px" }}>novagem</span>
         </p>
 
       </div>

@@ -58,7 +58,7 @@ export default function AdminPage() {
         <div style={{ position: "absolute", top: "-80px", right: "-60px", width: "300px", height: "300px", borderRadius: "50%", background: "rgba(255,255,255,0.04)" }} />
         <div style={{ position: "absolute", bottom: "-60px", left: "5%", width: "200px", height: "200px", borderRadius: "50%", background: "rgba(255,107,157,0.08)" }} />
         <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative" }}>
-          <p style={{ fontSize: "11px", letterSpacing: "4px", color: "#c4a8f0", textTransform: "uppercase", fontWeight: "600", marginBottom: "10px" }}>Gleamia</p>
+          <p style={{ fontSize: "11px", letterSpacing: "4px", color: "#c4a8f0", textTransform: "uppercase", fontWeight: "600", marginBottom: "10px" }}>novagem</p>
           <h1 style={{ fontSize: "clamp(26px,4vw,42px)", fontFamily: "Georgia,serif", fontWeight: "300", color: "#fff", margin: "0 0 8px", letterSpacing: "2px" }}>⚙️ Admin Dashboard</h1>
           <p style={{ color: "#c4a8f0", fontSize: "14px" }}>Welcome back, <strong style={{ color: "#fff" }}>{adminEmail}</strong></p>
         </div>

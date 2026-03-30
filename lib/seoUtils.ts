@@ -10,7 +10,7 @@
  * @returns {Object} Metadata object
  */
 export function generateSEOMetadata(config) {
-  const baseUrl = 'https://gleamia.com';
+  const baseUrl = 'https://novagem.com';
   const url = config.url || baseUrl;
   const imageUrl = config.image || `${baseUrl}/og-image.jpg`;
 
@@ -31,7 +31,7 @@ export function generateSEOMetadata(config) {
           alt: config.title,
         },
       ],
-      siteName: 'GLEAMIA',
+      siteName: 'novagem',
     },
     twitter: {
       card: 'summary_large_image',
@@ -77,14 +77,14 @@ export function generateProductSchema(product) {
     '@type': 'Product',
     name: product.name,
     description: product.description,
-    image: product.image || 'https://gleamia.com/product.jpg',
+    image: product.image || 'https://novagem.com/product.jpg',
     brand: {
       '@type': 'Brand',
-      name: 'GLEAMIA',
+      name: 'novagem',
     },
     offers: {
       '@type': 'Offer',
-      url: `https://gleamia.com/products/${product.id}`,
+      url: `https://novagem.com/products/${product.id}`,
       priceCurrency: 'USD',
       price: product.price.toString(),
       priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
@@ -108,15 +108,15 @@ export function generateOrganizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'GLEAMIA',
-    url: 'https://gleamia.com',
-    logo: 'https://gleamia.com/logo.jpg',
+    name: 'novagem',
+    url: 'https://novagem.com',
+    logo: 'https://novagem.com/logo.jpg',
     description:
       'Premium handcrafted jewelry - necklaces, rings, earrings and accessories.',
     sameAs: [
-      'https://www.facebook.com/gleamia',
-      'https://www.instagram.com/gleamia',
-      'https://twitter.com/gleamia',
+      'https://www.facebook.com/novagem',
+      'https://www.instagram.com/novagem',
+      'https://twitter.com/novagem',
     ],
     contact: {
       '@type': 'ContactPoint',
@@ -134,10 +134,10 @@ export function generateLocalBusinessSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    name: 'GLEAMIA Jewelry Store',
-    image: 'https://gleamia.com/store.jpg',
-    '@id': 'https://gleamia.com',
-    url: 'https://gleamia.com',
+    name: 'novagem Jewelry Store',
+    image: 'https://novagem.com/store.jpg',
+    '@id': 'https://novagem.com',
+    url: 'https://novagem.com',
     telephone: '+1-XXX-XXX-XXXX',
     priceRange: '$$',
     address: {
@@ -173,7 +173,7 @@ export function generateLocalBusinessSchema() {
 
 export const SEO_CONFIG = {
   HOME: {
-    title: 'GLEAMIA | Premium Handcrafted Jewelry Store',
+    title: 'novagem | Premium Handcrafted Jewelry Store',
     description:
       'Discover handcrafted jewelry that tells your story. Shop timeless necklaces, rings, earrings and accessories online. Premium quality, fair prices.',
     keywords: [
@@ -188,7 +188,7 @@ export const SEO_CONFIG = {
     ],
   },
   PRODUCTS: {
-    title: 'Shop Jewelry | GLEAMIA',
+    title: 'Shop Jewelry | novagem',
     description:
       'Browse our complete collection of handcrafted jewelry including necklaces, rings, earrings and accessories. Find your perfect piece today.',
     keywords: [
@@ -201,33 +201,33 @@ export const SEO_CONFIG = {
     ],
   },
   LOGIN: {
-    title: 'Login | GLEAMIA',
-    description: 'Sign in to your GLEAMIA account to shop our premium jewelry collection.',
-    keywords: ['login', 'sign in', 'account', 'GLEAMIA'],
+    title: 'Login | novagem',
+    description: 'Sign in to your novagem account to shop our premium jewelry collection.',
+    keywords: ['login', 'sign in', 'account', 'novagem'],
   },
   SIGNUP: {
-    title: 'Sign Up | GLEAMIA',
-    description: 'Create your GLEAMIA account to start shopping our handcrafted jewelry collection.',
-    keywords: ['signup', 'register', 'create account', 'GLEAMIA'],
+    title: 'Sign Up | novagem',
+    description: 'Create your novagem account to start shopping our handcrafted jewelry collection.',
+    keywords: ['signup', 'register', 'create account', 'novagem'],
   },
   ADMIN: {
-    title: 'Admin Dashboard | GLEAMIA',
-    description: 'Admin dashboard for GLEAMIA - manage products, orders, and analytics.',
+    title: 'Admin Dashboard | novagem',
+    description: 'Admin dashboard for novagem - manage products, orders, and analytics.',
     keywords: ['admin', 'dashboard', 'management'],
   },
   USER_DASHBOARD: {
-    title: 'My Account | GLEAMIA',
-    description: 'Manage your GLEAMIA account, orders, and wishlist.',
+    title: 'My Account | novagem',
+    description: 'Manage your novagem account, orders, and wishlist.',
     keywords: ['account', 'profile', 'orders', 'wishlist'],
   },
   CART: {
-    title: 'Shopping Cart | GLEAMIA',
+    title: 'Shopping Cart | novagem',
     description: 'Review your shopping cart and proceed to checkout.',
     keywords: ['cart', 'shopping', 'checkout'],
   },
   CHECKOUT: {
-    title: 'Checkout | GLEAMIA',
-    description: 'Complete your purchase at GLEAMIA. Secure payment processing.',
+    title: 'Checkout | novagem',
+    description: 'Complete your purchase at novagem. Secure payment processing.',
     keywords: ['checkout', 'payment', 'order'],
   },
 };
@@ -238,5 +238,5 @@ export const SEO_CONFIG = {
  * @returns {string} Full canonical URL
  */
 export function getCanonicalUrl(pathname) {
-  return `https://gleamia.com${pathname}`;
+  return `https://novagem.com${pathname}`;
 }
