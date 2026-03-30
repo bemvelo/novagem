@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 
-type Props = {
-  value: string;
-  onChange: (val: string) => void;
-};
-
-export default function SearchBar({ value, onChange }: Props) {
+export default function SearchBar({ value, onChange }) {
   const [focused, setFocused] = useState(false);
 
   return (

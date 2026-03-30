@@ -4,17 +4,6 @@ import React from 'react';
 import StarRating from './StarRating';
 import { formatRelativeDate } from '@/lib/dateUtils';
 
-interface ReviewCardProps {
-  id: string;
-  userName: string;
-  rating: number;
-  title: string;
-  text: string;
-  createdAt: Date | string;
-  helpful: number;
-  onHelpful?: (reviewId: string) => void;
-}
-
 export default function ReviewCard({
   id,
   userName,
@@ -24,7 +13,7 @@ export default function ReviewCard({
   createdAt,
   helpful,
   onHelpful,
-}: ReviewCardProps) {
+}) {
   const [isHelpful, setIsHelpful] = React.useState(false);
 
   const handleHelpful = () => {

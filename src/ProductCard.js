@@ -1,15 +1,6 @@
 "use client";
 
-type ProductCardProps = {
-  product: {
-    id: string;
-    name: string;
-    price: number;
-  };
-  addToCart: (product: any) => void;
-};
-
-export default function ProductCard({ product, addToCart }: ProductCardProps) {
+export default function ProductCard({ product, addToCart }) {
   return (
     <div className="border p-4 rounded shadow">
       <h2 className="text-lg font-bold">{product.name}</h2>

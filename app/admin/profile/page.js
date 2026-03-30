@@ -4,11 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 import NavBar from "../../../components/NavBar";
-type UserRole = "admin" | "user" | null;
 
 export default function AdminProfilePage() {
   const router = useRouter();
-  const [role, setRole] = useState<UserRole>(null);
+  const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
 
@@ -35,8 +34,8 @@ export default function AdminProfilePage() {
         } else {
           setRole(data.role);
         }
-      } catch (err: any) {
-        console.error(err.message);
+      } catch (err) {
+        console.error(err?.message || err);
       } finally {
         setLoading(false);
       }
