@@ -29,19 +29,21 @@ export default function Footer() {
           }}
         >
           {[
-            ["Free Delivery", "On orders over $300"],
-            ["Secure Payment"],
-            ["Quality Guaranteed"],
-          ].map(([icon, title, sub]) => (
-            <div key={title} style={{ display: "flex", gap: "10px" }}>
-              <span>{icon}</span>
+            { title: "Free Delivery", sub: "On orders over $300" },
+            { title: "Secure Payment", sub: "" },
+            { title: "Quality Guaranteed", sub: "" },
+          ].map((item) => (
+            <div key={item.title} style={{ display: "flex", gap: "10px" }}>
+              <span>•</span>
               <div>
                 <div style={{ fontSize: "12px", fontWeight: "700" }}>
-                  {title}
+                  {item.title}
                 </div>
-                <div style={{ fontSize: "11px", color: "#b76e79" }}>
-                  {sub}
-                </div>
+                {item.sub ? (
+                  <div style={{ fontSize: "11px", color: "#b76e79" }}>
+                    {item.sub}
+                  </div>
+                ) : null}
               </div>
             </div>
           ))}
