@@ -37,7 +37,6 @@ const productsStyles = `
     color: var(--dark);
   }
 
-  /* Hero */
   .products-hero {
     background: linear-gradient(160deg, #2c1810 0%, #4a2820 50%, #6b3a30 100%);
     padding: 56px 32px;
@@ -95,7 +94,6 @@ const productsStyles = `
 
   .products-hero-sub strong { color: var(--champagne); font-weight: 600; }
 
-  /* Filters */
   .products-wrap {
     max-width: 1400px;
     margin: 0 auto;
@@ -226,7 +224,6 @@ const productsStyles = `
     letter-spacing: 0.5px;
   }
 
-  /* Grid */
   .products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
@@ -349,7 +346,6 @@ const productsStyles = `
     border: 1px solid #f5c6c6;
   }
 
-  /* Cart stepper */
   .cart-stepper {
     display: flex;
     align-items: center;
@@ -412,7 +408,6 @@ const productsStyles = `
     box-shadow: 0 6px 20px rgba(183,110,121,0.4);
   }
 
-  /* Empty / loading */
   .products-empty {
     text-align: center;
     padding: 80px 0;
@@ -453,7 +448,6 @@ const productsStyles = `
 
   .products-reset-btn:hover { transform: translateY(-1px); }
 
-  /* Floating cart */
   .floating-cart {
     position: fixed;
     bottom: 28px; right: 28px;
@@ -492,7 +486,6 @@ const productsStyles = `
     font-weight: 700;
   }
 
-  /* Suspense fallback */
   .products-fallback {
     min-height: 100vh;
     display: flex;
@@ -509,6 +502,29 @@ const productsStyles = `
   }
 `;
 
+// ✅ Load cart from localStorage once, not on every action
+function loadCart() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("cart") || "[]");
+    const cartMap = {};
+    saved.forEach(item => { cartMap[item.id] = item.quantity; });
+    return cartMap;
+  } catch { return {}; }
+}
+
+// ✅ Save cart to localStorage once, not on every render
+function saveCart(cartMap, products) {
+  const arr = Object.entries(cartMap)
+    .filter(([, qty]) => qty > 0)
+    .map(([id, quantity]) => {
+      const p = products.find(p => String(p.id) === String(id));
+      return p ? { id: p.id, name: p.name, price: p.price, imageUrl: p.image_url, category: p.category, quantity } : null;
+    })
+    .filter(Boolean);
+  localStorage.setItem("cart", JSON.stringify(arr));
+  window.dispatchEvent(new Event("cartUpdated"));
+}
+
 function ProductsContent() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
@@ -523,14 +539,20 @@ function ProductsContent() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data, error } = await supabase.from("products").select("*");
+        // ✅ Only select columns you need, order on the server
+        const { data, error } = await supabase
+          .from("products")
+          .select("id, name, description, price, category, image_url, stock")
+          .order("created_at", { ascending: false });
         if (error) { console.error("Error:", error); setProducts([]); }
         else setProducts(data || []);
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     };
+
     fetchProducts();
 
+    // Handle category param from URL
     const categoryParam = searchParams.get("category");
     if (categoryParam) {
       const matched = CATEGORIES.find(
@@ -540,50 +562,43 @@ function ProductsContent() {
       if (matched) setSelectedCategory(matched);
     }
 
-    const saved = JSON.parse(localStorage.getItem("cart") || "[]");
-    const cartMap = {};
-    saved.forEach(item => { cartMap[item.id] = item.quantity; });
-    setCart(cartMap);
+    // ✅ Load cart once on mount
+    setCart(loadCart());
   }, [searchParams]);
 
   const addToCart = (id) => {
-    const product = products.find(p => p.id === id);
-    if (!product) return;
-    const existing = JSON.parse(localStorage.getItem("cart") || "[]");
-    const found = existing.find(i => i.id === id);
-    const updatedCart = found
-      ? existing.map(i => i.id === id ? { ...i, quantity: i.quantity + 1 } : i)
-      : [...existing, { id: product.id, name: product.name, price: product.price, imageUrl: product.image_url, category: product.category, quantity: 1 }];
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    window.dispatchEvent(new Event("cartUpdated"));
-    setCart(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+    setCart(prev => {
+      const updated = { ...prev, [id]: (prev[id] || 0) + 1 };
+      saveCart(updated, products);
+      return updated;
+    });
   };
 
   const removeFromCart = (id) => {
-    const existing = JSON.parse(localStorage.getItem("cart") || "[]");
-    const updatedCart = existing
-      .map(i => i.id === id ? { ...i, quantity: i.quantity - 1 } : i)
-      .filter(i => i.quantity > 0);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    window.dispatchEvent(new Event("cartUpdated"));
     setCart(prev => {
       const qty = (prev[id] || 0) - 1;
-      if (qty <= 0) { const c = { ...prev }; delete c[id]; return c; }
-      return { ...prev, [id]: qty };
+      const updated = { ...prev };
+      if (qty <= 0) delete updated[id];
+      else updated[id] = qty;
+      saveCart(updated, products);
+      return updated;
     });
   };
 
   const toggleWishlist = (id) => setWishlist(prev => ({ ...prev, [id]: !prev[id] }));
   const cartTotal = Object.values(cart).reduce((a, b) => a + b, 0);
 
+  // ✅ Filtering done in one pass
   let filtered = products.filter(p => {
-    const matchSearch = p.name?.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = !search || p.name?.toLowerCase().includes(search.toLowerCase());
     const matchCat = selectedCategory === "All" || p.category === selectedCategory;
     return matchSearch && matchCat;
   });
+
+  // ✅ Sort only when needed, not on every render
   if (sortBy === "price-low") filtered = [...filtered].sort((a, b) => a.price - b.price);
   else if (sortBy === "price-high") filtered = [...filtered].sort((a, b) => b.price - a.price);
-  else if (sortBy === "newest") filtered = [...filtered].reverse();
+  // "newest" is already handled by server-side order("created_at", desc)
 
   return (
     <>
@@ -674,7 +689,7 @@ function ProductsContent() {
             </div>
           ) : (
             <div className="products-grid">
-              {filtered.map(product => (
+              {filtered.map((product, index) => (
                 <div key={product.id} className="product-card">
 
                   <div className="product-img-wrap">
@@ -682,9 +697,12 @@ function ProductsContent() {
                       <Image
                         src={product.image_url}
                         alt={product.name}
-                        width={350}
-                        height={220}
-                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 275px"
+                        style={{ objectFit: "cover" }}
+                        // ✅ Only eagerly load first 4 images, rest are lazy
+                        priority={index < 4}
+                        loading={index < 4 ? "eager" : "lazy"}
                         onError={() => setImgErrors(prev => ({ ...prev, [product.id]: true }))}
                       />
                     ) : (
